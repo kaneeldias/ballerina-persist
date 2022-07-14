@@ -1,0 +1,8 @@
+[package]
+org = "kaneel"
+name = "persist_redcross"
+version = "0.1.0"
+distribution = "2201.1.0-rc1.9"
+
+[build-options]
+observabilityIncluded = true
