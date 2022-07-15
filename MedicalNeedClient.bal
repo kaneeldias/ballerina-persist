@@ -1,10 +1,7 @@
-import ballerinax/mysql;
-import ballerinax/mysql.driver as _;
 import ballerina/sql;
 
 client class MedicalNeedClient {
 
-    private final mysql:Client dbClient = check new (host = HOST, user = USER, password = PASSWORD, database = DATABASE, port = PORT);
     private final sql:ParameterizedQuery tableName = `MedicalNeeds`;
     private final map<[string, sql:ParameterizedQuery]> fieldMap = {
         needId: ["needId", `needId`],
