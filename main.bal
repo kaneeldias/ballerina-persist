@@ -2,7 +2,7 @@ import ballerina/io;
 
 public function main() returns error? {
     MedicalNeedClient mnClient = check new();
-    int idx = 10;
+    int idx = 13;
     int? id = check mnClient->create({
         needId: idx,
         itemId: 1,
@@ -13,25 +13,25 @@ public function main() returns error? {
     });
     io:println(id);
 
-    MedicalNeed need = check mnClient->readByKey(1);
+    record {} need = check mnClient->readByKey(idx);
     io:println(need);
 
-    stream<MedicalNeed, error?> medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
-    _ = check from MedicalNeed x in medicalNeedStream
+    stream<record {}, error?> medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
+    _ = check from record {} x in medicalNeedStream
         do {
             io:println(x);
         };
 
     check mnClient->update({"beneficiaryId": 2, "quantity": 10}, {itemId: 1, urgency: "URGENT"});
     medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
-    _ = check from MedicalNeed x in medicalNeedStream
+    _ = check from record {} x in medicalNeedStream
         do {
             io:println(x);
         };
 
     check mnClient->delete({itemId: 1, urgency: "URGENT"});
     medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
-    _ = check from MedicalNeed x in medicalNeedStream
+    _ = check from record {} x in medicalNeedStream
         do {
             io:println(x);
         };
