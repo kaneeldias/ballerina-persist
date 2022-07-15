@@ -5,12 +5,15 @@ public type MedicalNeed record {|
   int itemId; 
   int beneficiaryId; 
   time:Civil  period;
+  
+  //TODO: How can we handle enum types?
   string urgency;
   int quantity;
 |};
 
-public enum Urgency {
-  NORMAL = "NORMAL",
-  CRUCIAL = "CRUCIAL",
-  URGENT = "URGENT"
-}
+public type MedicalItem record {|
+    int itemId; 
+    string name;
+    string 'type;
+    string unit;  
+|};
