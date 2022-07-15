@@ -2,7 +2,7 @@ import ballerina/io;
 
 public function main() returns error? {
     MedicalNeedClient mnClient = check new();
-    int idx = 13;
+    int idx = 15;
     int? id = check mnClient->create({
         needId: idx,
         itemId: 1,
@@ -32,6 +32,40 @@ public function main() returns error? {
     check mnClient->delete({itemId: 1, urgency: "URGENT"});
     medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
     _ = check from record {} x in medicalNeedStream
+        do {
+            io:println(x);
+        };
+
+
+
+    MedicalItemClient miClient = check new();
+    id = check miClient->create({
+        itemId: idx,
+        name: "item1",
+        'type: "liquid",
+        unit: "ml"
+    });
+    io:println(id);
+
+    record {} item = check miClient->readByKey(idx);
+    io:println(item);
+
+    stream<record {}, error?> medicalItemStream = check miClient->read({'type: "liquid", unit: "ml"});
+    _ = check from record {} x in medicalItemStream
+        do {
+            io:println(x);
+        };
+
+    check miClient->update({"name": "item2"}, {'type: "liquid", unit: "ml"});
+    medicalItemStream = check miClient->read({'type: "liquid", unit: "ml"});
+    _ = check from record {} x in medicalItemStream
+        do {
+            io:println(x);
+        };
+
+    check miClient->delete({'type: "liquid", unit: "ml"});
+    medicalItemStream = check miClient->read({'type: "liquid", unit: "ml"});
+    _ = check from record {} x in medicalItemStream
         do {
             io:println(x);
         };
