@@ -26,15 +26,15 @@ client class MedicalItemClient {
         return <int>result.lastInsertId;
     }
 
-    // TODO: change return type to `MedicalItem`
-    remote function readByKey(int key) returns record {}|error {
-        return check self.persistClient.runReadByKeyQuery(key);
+    remote function readByKey(int key) returns MedicalItem|error {
+        anydata result = check self.persistClient.runReadByKeyQuery(key);
+        return <MedicalItem>result;
     }
 
     // TODO: filter query
-    // TODO: change return type to `MedicalItem`
-    remote function read(map<anydata> filter) returns stream<record {}, error?>|error {
-        return self.persistClient.runReadQuery(filter);
+    remote function read(map<anydata> filter) returns stream<MedicalItem, error?>|error {
+        stream<anydata, error?> result = check self.persistClient.runReadQuery(filter);
+        return new stream<MedicalItem, error?>(new MedicalItemStream(result));
     }
 
     // TODO: filter query
@@ -47,4 +47,28 @@ client class MedicalItemClient {
         _ = check self.persistClient.runDeleteQuery(filter);
     }
 
+}
+
+public class MedicalItemStream {
+    private stream<anydata, error?> anydataStream;
+
+    public isolated function init(stream<anydata, error?> anydataStream) {
+        self.anydataStream = anydataStream;
+    }
+
+    public isolated function next() returns record {|MedicalItem value;|}|error? {
+        var streamValue = self.anydataStream.next();
+        if (streamValue is ()) {
+            return streamValue;
+        } else if (streamValue is error) {
+            return streamValue;
+        } else {
+            record {|MedicalItem value;|} nextRecord = {value: <MedicalItem>streamValue.value};
+            return nextRecord;
+        }
+    }
+
+    public isolated function close() returns error? {
+        return self.anydataStream.close();
+    }
 }

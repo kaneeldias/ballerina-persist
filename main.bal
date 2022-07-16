@@ -13,25 +13,25 @@ public function main() returns error? {
     });
     io:println(id);
 
-    record {} need = check mnClient->readByKey(idx);
+    MedicalNeed need = check mnClient->readByKey(idx);
     io:println(need);
 
-    stream<record {}, error?> medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
-    _ = check from record {} x in medicalNeedStream
+    stream<MedicalNeed, error?> medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
+    _ = check from MedicalNeed x in medicalNeedStream
         do {
             io:println(x);
         };
 
     check mnClient->update({"beneficiaryId": 2, "quantity": 10}, {itemId: 1, urgency: "URGENT"});
     medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
-    _ = check from record {} x in medicalNeedStream
+    _ = check from MedicalNeed x in medicalNeedStream
         do {
             io:println(x);
         };
 
     check mnClient->delete({itemId: 1, urgency: "URGENT"});
     medicalNeedStream = check mnClient->read({itemId: 1, urgency: "URGENT"});
-    _ = check from record {} x in medicalNeedStream
+    _ = check from MedicalNeed x in medicalNeedStream
         do {
             io:println(x);
         };
@@ -47,25 +47,25 @@ public function main() returns error? {
     });
     io:println(id);
 
-    record {} item = check miClient->readByKey(idx);
+    MedicalItem item = check miClient->readByKey(idx);
     io:println(item);
 
-    stream<record {}, error?> medicalItemStream = check miClient->read({'type: "liquid", unit: "ml"});
-    _ = check from record {} x in medicalItemStream
+    stream<MedicalItem, error?> medicalItemStream = check miClient->read({'type: "liquid", unit: "ml"});
+    _ = check from MedicalItem x in medicalItemStream
         do {
             io:println(x);
         };
 
     check miClient->update({"name": "item2"}, {'type: "liquid", unit: "ml"});
     medicalItemStream = check miClient->read({'type: "liquid", unit: "ml"});
-    _ = check from record {} x in medicalItemStream
+    _ = check from MedicalItem x in medicalItemStream
         do {
             io:println(x);
         };
 
     check miClient->delete({'type: "liquid", unit: "ml"});
     medicalItemStream = check miClient->read({'type: "liquid", unit: "ml"});
-    _ = check from record {} x in medicalItemStream
+    _ = check from MedicalItem x in medicalItemStream
         do {
             io:println(x);
         };
