@@ -1,20 +1,24 @@
+import ballerinax/mysql;
+import ballerinax/mysql.driver as _;
 import ballerina/sql;
 
 client class MedicalItemClient {
 
-    private final sql:ParameterizedQuery tableName = `MedicalItem`;
-    private final map<[string, sql:ParameterizedQuery]> fieldMap = {
-        itemId: ["itemId", `itemId`],
-        name: ["name", `name`],
-        'type: ["type", `type`],
-        unit: ["unit", `unit`]
+    private final string entityName = "MedicalItems";
+    private final sql:ParameterizedQuery tableName = `MedicalItems`;
+    private final map<FieldMetadata> fieldMetadata = {
+        itemId: { columnName: "itemId", 'type: int },
+        name: { columnName: "name", 'type: string },
+        'type: { columnName: "type", 'type: string },
+        unit: { columnName: "unit", 'type: string }
     };
     private string[] keyFields = ["itemId"];
 
-    private PersistClient persistClient;
+    private SQLClient persistClient;
 
     public function init() returns error? {
-        self.persistClient = check new(self.tableName, self.fieldMap, self.keyFields);
+        mysql:Client dbClient = check new (host = HOST, user = USER, password = PASSWORD, database = DATABASE, port = PORT);
+        self.persistClient = check new(self.entityName, self.tableName, self.fieldMetadata, self.keyFields, dbClient);
     }
 
     remote function create(MedicalItem value) returns int|error? {
@@ -31,19 +35,16 @@ client class MedicalItemClient {
         return check self.persistClient.runReadByKeyQuery(key);
     }
 
-    // TODO: filter query
     // TODO: change return type to `MedicalItem`
-    remote function read(map<anydata> filter) returns stream<record {}, error?>|error {
+    remote function read(map<anydata>|FilterQuery filter) returns stream<record {}, sql:Error?>|error {
         return self.persistClient.runReadQuery(filter);
     }
 
-    // TODO: filter query
-    remote function update(record {} 'object, map<anydata> filter) returns error? {
+    remote function update(record {} 'object, map<anydata>|FilterQuery filter) returns error? {
         _ = check self.persistClient.runUpdateQuery('object, filter);
     }
 
-    // TODO: filter query
-    remote function delete(map<anydata> filter) returns error? {
+    remote function delete(map<anydata>|FilterQuery filter) returns error? {
         _ = check self.persistClient.runDeleteQuery(filter);
     }
 
