@@ -1,28 +1,18 @@
-import ballerina/sql;
 import ballerinax/mysql;
-import ballerina/time;
+import ballerinax/mysql.driver as _;
+import ballerina/sql;
 
-configurable string USER = ?;
-configurable string PASSWORD = ?;
-configurable string HOST = ?;
-configurable string DATABASE = ?;
-configurable int PORT = ?;
+client class MedicalItemClient {
 
-client class MedicalNeedClient {
-
-    private final string entityName = "MedicalNeed";
-    private final sql:ParameterizedQuery tableName = `MedicalNeeds`;
-    
-    // TODO: Include SQL metadata (AUTO GENERATED etc.)
+    private final string entityName = "MedicalItems";
+    private final sql:ParameterizedQuery tableName = `MedicalItems`;
     private final map<FieldMetadata> fieldMetadata = {
-        needId: { columnName: "needId", 'type: int },
         itemId: { columnName: "itemId", 'type: int },
-        beneficiaryId: { columnName: "beneficiaryId", 'type: int },
-        period: { columnName: "period", 'type: time:Civil },
-        urgency: { columnName: "urgency", 'type: string },
-        quantity: { columnName: "quantity", 'type: int }
+        name: { columnName: "name", 'type: string },
+        'type: { columnName: "type", 'type: string },
+        unit: { columnName: "unit", 'type: string }
     };
-    private string[] keyFields = ["needId"];
+    private string[] keyFields = ["itemId"];
 
     private SQLClient persistClient;
 
@@ -31,22 +21,20 @@ client class MedicalNeedClient {
         self.persistClient = check new(self.entityName, self.tableName, self.fieldMetadata, self.keyFields, dbClient);
     }
 
-    remote function create(MedicalNeed value) returns int|error? {
+    remote function create(MedicalItem value) returns int|error? {
         sql:ExecutionResult result = check self.persistClient.runInsertQuery(value);
 
-        //TODO: How can we handle returning composite keys
         if result.lastInsertId is () {
-            return value.needId;
+            return value.itemId;
         }
         return <int>result.lastInsertId;
     }
 
-    // TODO: change return type to `MedicalNeed`
-    remote function readByKey(int key) returns record {}|error {
-        return check self.persistClient.runReadByKeyQuery(key);
+    remote function readByKey(int key) returns MedicalItem|error {
+        return (check self.persistClient.runReadByKeyQuery(key)).cloneWithType(MedicalItem);
     }
 
-    // TODO: change return type to `MedicalNeed`
+    // TODO: change return type to `MedicalItem`
     remote function read(map<anydata>|FilterQuery filter) returns stream<record {}, sql:Error?>|error {
         return self.persistClient.runReadQuery(filter);
     }
