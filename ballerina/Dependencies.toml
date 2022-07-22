@@ -48,16 +48,24 @@ dependencies = [
 
 [[package]]
 org = "ballerina"
-name = "observe"
-version = "1.0.5"
+name = "persisr"
+version = "0.1.0"
 dependencies = [
-	{org = "ballerina", name = "jballerina.java"}
+	{org = "ballerina", name = "io"},
+	{org = "ballerina", name = "sql"},
+	{org = "ballerina", name = "test"},
+	{org = "ballerina", name = "time"},
+	{org = "ballerinax", name = "mysql"},
+	{org = "ballerinax", name = "mysql.driver"}
+]
+modules = [
+	{org = "ballerina", packageName = "persisr", moduleName = "persisr"}
 ]
 
 [[package]]
 org = "ballerina"
 name = "sql"
-version = "1.4.1"
+version = "1.5.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -92,18 +100,6 @@ modules = [
 ]
 
 [[package]]
-org = "ballerinai"
-name = "observe"
-version = "0.0.0"
-dependencies = [
-	{org = "ballerina", name = "jballerina.java"},
-	{org = "ballerina", name = "observe"}
-]
-modules = [
-	{org = "ballerinai", packageName = "observe", moduleName = "observe"}
-]
-
-[[package]]
 org = "ballerinax"
 name = "mysql"
 version = "1.4.1"
@@ -126,23 +122,6 @@ version = "1.3.0"
 scope = "testOnly"
 modules = [
 	{org = "ballerinax", packageName = "mysql.driver", moduleName = "mysql.driver"}
-]
-
-[[package]]
-org = "kaneel"
-name = "persist_redcross"
-version = "0.1.0"
-dependencies = [
-	{org = "ballerina", name = "io"},
-	{org = "ballerina", name = "sql"},
-	{org = "ballerina", name = "test"},
-	{org = "ballerina", name = "time"},
-	{org = "ballerinai", name = "observe"},
-	{org = "ballerinax", name = "mysql"},
-	{org = "ballerinax", name = "mysql.driver"}
-]
-modules = [
-	{org = "kaneel", packageName = "persist_redcross", moduleName = "persist_redcross"}
 ]
 
 
