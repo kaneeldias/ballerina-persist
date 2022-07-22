@@ -1,6 +1,6 @@
 [package]
 org = "ballerina"
-name = "persisr"
+name = "persist"
 version = "0.1.0"
 authors = ["Ballerina"]
 keywords = ["persist"]
