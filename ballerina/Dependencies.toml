@@ -48,7 +48,7 @@ dependencies = [
 
 [[package]]
 org = "ballerina"
-name = "persisr"
+name = "persist"
 version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -59,7 +59,7 @@ dependencies = [
 	{org = "ballerinax", name = "mysql.driver"}
 ]
 modules = [
-	{org = "ballerina", packageName = "persisr", moduleName = "persisr"}
+	{org = "ballerina", packageName = "persist", moduleName = "persist"}
 ]
 
 [[package]]
