@@ -47,4 +47,8 @@ client class MedicalItemClient {
         _ = check self.persistClient.runDeleteQuery(filter);
     }
 
+    function close() returns error? {
+        return self.persistClient.close();
+    }
+
 }

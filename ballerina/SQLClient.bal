@@ -21,7 +21,7 @@ public client class SQLClient {
     function runInsertQuery(record {} 'object) returns sql:ExecutionResult|error {
         sql:ParameterizedQuery query = sql:queryConcat(
             `INSERT INTO `, self.tableName, ` (`,
-            self.getColumnNames(), `) `,
+            self.getColumnNames(), ` ) `,
             `VALUES `, self.getInsertQueryParams('object)
         );
         return check self.dbClient->execute(query);
@@ -142,5 +142,9 @@ public client class SQLClient {
             return <FieldDoesNotExistError>error("Field '" + fieldName + "' does not exist in entity '" + self.entityName + "'.");
         }
         return stringToParameterizedQuery(fieldMetadata.columnName);
+    }
+
+    function close() returns error? {
+        return self.dbClient.close();
     }
 }

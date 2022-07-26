@@ -5,7 +5,7 @@ import ballerina/time;
 client class MedicalNeedClient {
 
     private final string entityName = "MedicalNeed";
-    private final sql:ParameterizedQuery tableName = `MedicalNeeds2`;
+    private final sql:ParameterizedQuery tableName = `MedicalNeeds`;
     
     // TODO: Include SQL metadata (AUTO GENERATED etc.)
     private final map<FieldMetadata> fieldMetadata = {
@@ -27,15 +27,9 @@ client class MedicalNeedClient {
 
     remote function create(MedicalNeed value) returns int|error? {
         sql:ExecutionResult result = check self.persistClient.runInsertQuery(value);
-
-        //TODO: How can we handle returning composite keys
-        if result.lastInsertId is () {
-            return value.needId;
-        }
         return <int>result.lastInsertId;
     }
 
-    // TODO: change return type to `MedicalNeed`
     remote function readByKey(int key) returns MedicalNeed|error {
         return (check self.persistClient.runReadByKeyQuery(key)).cloneWithType(MedicalNeed);
     }
@@ -51,6 +45,10 @@ client class MedicalNeedClient {
 
     remote function delete(map<anydata>|FilterQuery filter) returns error? {
         _ = check self.persistClient.runDeleteQuery(filter);
+    }
+
+    function close() returns error? {
+        return self.persistClient.close();
     }
 
 }
