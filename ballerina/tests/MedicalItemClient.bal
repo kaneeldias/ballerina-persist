@@ -34,9 +34,9 @@ client class MedicalItemClient {
         return (check self.persistClient.runReadByKeyQuery(key)).cloneWithType(MedicalItem);
     }
 
-    // TODO: change return type to `MedicalItem`
-    remote function read(map<anydata>|FilterQuery filter) returns stream<record {}, sql:Error?>|error {
-        return self.persistClient.runReadQuery(filter);
+    remote function read(map<anydata>|FilterQuery? filter = ()) returns stream<MedicalItem, error?>|error {
+        stream<anydata, error?> result = check self.persistClient.runReadQuery(filter);
+        return new stream<MedicalItem, error?>(new MedicalItemStream(result));
     }
 
     remote function update(record {} 'object, map<anydata>|FilterQuery filter) returns error? {
@@ -52,3 +52,28 @@ client class MedicalItemClient {
     }
 
 }
+
+public class MedicalItemStream {
+    private stream<anydata, error?> anydataStream;
+
+    public isolated function init(stream<anydata, error?> anydataStream) {
+        self.anydataStream = anydataStream;
+    }
+
+    public isolated function next() returns record {|MedicalItem value;|}|error? {
+        var streamValue = self.anydataStream.next();
+        if streamValue is () {
+            return streamValue;
+        } else if (streamValue is error) {
+            return streamValue;
+        } else {
+            record {|MedicalItem value;|} nextRecord = {value: check streamValue.value.cloneWithType(MedicalItem)};
+            return nextRecord;
+        }
+    }
+
+    public isolated function close() returns error? {
+        return self.anydataStream.close();
+    }
+}
+

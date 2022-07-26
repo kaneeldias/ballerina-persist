@@ -67,13 +67,28 @@ function testReadByKey() returns error? {
     groups: ["basic"],
     dependsOn: [testCreate]
 }
-function testRead1() returns error? {
+function testReadByKeyNegative() returns error? {
+    MedicalItemClient miClient = check new();
+    MedicalItem|error item = miClient->readByKey(20);
+    if item is InvalidKey {
+        test:assertEquals(item.message(), "A record does not exist for 'MedicalItems' for key 20.");
+    } else {
+        test:assertFail("Error expected.");
+    }
+    check miClient.close();
+}
+
+@test:Config {
+    groups: ["basic"],
+    dependsOn: [testCreate]
+}
+function testRead() returns error? {
     MedicalItemClient miClient = check new();
     _ = check miClient->create({
         itemId: 2,
         name: "item2 name",
         'type: "type1",
-        unit: "kg"
+        unit: "ml"
     });
     _ = check miClient->create({
         itemId: 3,
@@ -89,12 +104,103 @@ function testRead1() returns error? {
     });
 
     int count = 0;
-    stream<record {}, error?> itemStream = check miClient->read({ 'type: "type1" });
-    _ = check from record {} item in itemStream
+    stream<MedicalItem, error?> itemStream = check miClient->read({ 'type: "type1" });
+    _ = check from MedicalItem _ in itemStream
         do {
-            test:assertTrue(item is MedicalItem);
+            count = count + 1;
+        };
+    test:assertEquals(count, 1);
+
+    count = 0;
+    itemStream = check miClient->read({ 'type: "type2" });
+    _ = check from MedicalItem _ in itemStream
+        do {
             count = count + 1;
         };
     check miClient.close();
     test:assertEquals(count, 2);
+}
+
+@test:Config {
+    groups: ["basic"],
+    dependsOn: [testCreate]
+}
+function testReadNegative() returns error? {
+    MedicalItemClient miClient = check new();
+    stream<MedicalItem, error?>|error itemStream = miClient->read({ typex: "type1" });
+    if itemStream is FieldDoesNotExist {
+        test:assertEquals(itemStream.message(), "Field 'typex' does not exist in entity 'MedicalItems'.");
+    } else {
+        test:assertFail("Error expected");
+    }
+    check miClient.close();
+}
+
+@test:Config {
+    groups: ["basic"],
+    dependsOn: [testRead]
+}
+function testUpdate() returns error? {
+    MedicalItemClient miClient = check new();
+    check miClient->update({ "unit": "kg" }, { 'type: "type2" });
+    stream<MedicalItem, error?> itemStream = check miClient->read();
+    int count = 0;
+    _ = check from MedicalItem item in itemStream
+        do {
+            if item.'type is "type2" {
+                test:assertEquals(item.unit, "kg");
+                count = count + 1;
+            } else {
+                test:assertEquals(item.unit, "ml");
+            }
+        };
+    test:assertEquals(count, 2);
+    check miClient.close();
+}
+
+@test:Config {
+    groups: ["basic"],
+    dependsOn: [testRead]
+}
+function testUpdateNegative() returns error? {
+    MedicalItemClient miClient = check new();
+    error? result = miClient->update({ "units": "kg" }, { 'type: "type2" });
+    if result is FieldDoesNotExist {
+        test:assertEquals(result.message(), "Field 'units' does not exist in entity 'MedicalItems'.");
+    } else {
+        test:assertFail("Error expected.");
+    }
+    check miClient.close();
+}
+
+@test:Config {
+    groups: ["basic"],
+    dependsOn: [testUpdate]
+}
+function testDelete() returns error? {
+    MedicalItemClient miClient = check new();
+    check miClient->delete({ 'type: "type2" });
+    stream<MedicalItem, error?> itemStream = check miClient->read();
+    int count = 0;
+    _ = check from MedicalItem _ in itemStream
+        do {
+            count = count + 1;
+        };
+    test:assertEquals(count, 2);
+    check miClient.close();
+}
+
+@test:Config {
+    groups: ["basic"],
+    dependsOn: [testUpdate]
+}
+function testDeleteNegative() returns error? {
+    MedicalItemClient miClient = check new();
+    error? result = miClient->delete({ 'types: "type2" });
+    if result is FieldDoesNotExist {
+        test:assertEquals(result.message(), "Field 'types' does not exist in entity 'MedicalItems'.");
+    } else {
+        test:assertFail("Error expected.");
+    }
+    check miClient.close();
 }

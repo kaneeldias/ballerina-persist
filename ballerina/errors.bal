@@ -1,3 +1,5 @@
 public type Error distinct error;
 
-public type FieldDoesNotExistError distinct Error;
+public type FieldDoesNotExist distinct Error;
+
+public type InvalidKey distinct Error;
